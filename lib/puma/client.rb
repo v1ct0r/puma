@@ -256,7 +256,7 @@ module Puma
 
       return false unless try_to_parse_proxy_protocol
 
-      @parsed_bytes = @parser.execute(@env, @buffer, @parsed_bytes)
+      @parsed_bytes = @parser.execute(@env, @buffer, @parsed_bytes, peerip || remote_addr_header || "-")
 
       if @parser.finished? && above_http_content_limit(@parser.body.bytesize)
         @http_content_length_limit_exceeded = true

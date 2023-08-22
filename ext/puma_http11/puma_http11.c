@@ -365,7 +365,7 @@ VALUE HttpParser_finish(VALUE self)
  * the parsing from that position.  It needs all of the original data as well
  * so you have to append to the data buffer as you read.
  */
-VALUE HttpParser_execute(VALUE self, VALUE req_hash, VALUE data, VALUE start)
+VALUE HttpParser_execute(VALUE self, VALUE req_hash, VALUE data, VALUE start, VALUE remote_ip)
 {
   puma_parser *http = NULL;
   int from = 0;
@@ -388,7 +388,10 @@ VALUE HttpParser_execute(VALUE self, VALUE req_hash, VALUE data, VALUE start)
     VALIDATE_MAX_LENGTH(puma_parser_nread(http), HEADER);
 
     if(puma_parser_has_error(http)) {
-      rb_raise(eHttpParserError, "%s", "Invalid HTTP format, parsing fails. Are you trying to open an SSL connection to a non-SSL Puma?");
+      char *ipptr = NULL;
+      ipptr = rb_extract_chars(remote_ip, &dlen);
+
+      rb_raise(eHttpParserError, "%s -- %s", "Invalid HTTP format, parsing fails. Are you trying to open an SSL connection to a non-SSL Puma?", ipptr);
     } else {
       return INT2FIX(puma_parser_nread(http));
     }
@@ -479,7 +482,7 @@ void Init_puma_http11(void)
   rb_define_method(cHttpParser, "initialize", HttpParser_init, 0);
   rb_define_method(cHttpParser, "reset", HttpParser_reset, 0);
   rb_define_method(cHttpParser, "finish", HttpParser_finish, 0);
-  rb_define_method(cHttpParser, "execute", HttpParser_execute, 3);
+  rb_define_method(cHttpParser, "execute", HttpParser_execute, 4);
   rb_define_method(cHttpParser, "error?", HttpParser_has_error, 0);
   rb_define_method(cHttpParser, "finished?", HttpParser_is_finished, 0);
   rb_define_method(cHttpParser, "nread", HttpParser_nread, 0);
