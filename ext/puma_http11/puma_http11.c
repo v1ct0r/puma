@@ -391,7 +391,7 @@ VALUE HttpParser_execute(VALUE self, VALUE req_hash, VALUE data, VALUE start, VA
       char *ipptr = NULL;
       ipptr = rb_extract_chars(remote_ip, &dlen);
 
-      rb_raise(eHttpParserError, "%s -- %s", "from C Invalid HTTP format, parsing fails. Are you trying to open an SSL connection to a non-SSL Puma?", ipptr);
+      rb_raise(eHttpParserError, "%s %s", "from C Invalid HTTP format, parsing fails. Are you trying to open an SSL connection to a non-SSL Puma?", ipptr);
     } else {
       return INT2FIX(puma_parser_nread(http));
     }
